@@ -23,10 +23,13 @@
 
 - name: install python-pip
   yum:
-    name: python-pip
+    name: "{{ item }}"
     state: present
   when:
     - ansible_distribution in ["CentOS","RedHat"]
+  loop:
+    - python-pip
+    - sshpass
 
 - name: install jq packages
   package:
