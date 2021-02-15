@@ -3,7 +3,7 @@
   blockinfile:
     dest: /etc/hosts
     block: |-
-      {% for item in (groups['container-registry']|default([]))|unique -%}{{ hostvars[item]['ip'] }} {{ item }} {% endfor %}
+      {% for item in (groups['container-registry']|default([]))|unique -%}{{ hostvars[item]['access_ip'] }} {{ item }} {% endfor %}
     state: present
     create: yes
     backup: yes
