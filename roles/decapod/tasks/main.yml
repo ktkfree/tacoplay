@@ -32,40 +32,40 @@
     {{ bin_dir }}/kubectl apply -f /tmp/.argo-additional-rbac.yaml
   become: false
 
-- name: check deploy-helmrelease-wftpl is exist
+- name: check createapp-wftpl is exist
   shell: >-
-    {{ bin_dir }}/argo template get deploy-helmrelease -nargo
+    {{ bin_dir }}/argo template get create-application -nargo
   ignore_errors: true
   register: shell_result
   become: false
 
-- name: remove deploy-helmrelease wftpl
+- name: remove create-application wftpl
   shell: >-
-    {{ bin_dir }}/argo template delete deploy-helmrelease -nargo
+    {{ bin_dir }}/argo template delete create-application -nargo
   when: not shell_result.failed
   become: false
 
-- name: summit helmrelease workflow template to argo
+- name: summit create-application workflow template to argo
   shell: >-
-    {{ bin_dir }}/argo template create {{ decapod_flow_dest }}/templates/helm-operator/helmrelease-wftpl.yaml -nargo
+    {{ bin_dir }}/argo template create {{ decapod_flow_dest }}/templates/argo-cd/createapp-wftpl.yaml -nargo
   become: false
 
-- name: check prepare-manifest-wftpl is exist
+- name: check prepare-argocd is exist
   shell: >-
-    {{ bin_dir }}/argo template get prepare-manifest -nargo
+    {{ bin_dir }}/argo template get prepare-argocd -nargo
   ignore_errors: true
   register: shell_result
   become: false
 
-- name: remove prepare-manifest wftpl
+- name: remove prepare-argocd wftpl
   shell: >-
-    {{ bin_dir }}/argo template delete prepare-manifest -nargo
+    {{ bin_dir }}/argo template delete prepare-argocd -nargo
   when: not shell_result.failed
   become: false
 
 - name: summit prepare-manifest workflow template to argo
   shell: >-
-    {{ bin_dir }}/argo template create {{ decapod_flow_dest }}/templates/decapod-yaml/prepare-manifest-wftpl.yaml -nargo
+    {{ bin_dir }}/argo template create {{ decapod_flow_dest }}/templates/argo-cd/prepare-argocd-wftpl.yaml -nargo
   become: false
 
 - name: delete decapod by-products
@@ -75,3 +75,8 @@
   with_items:
     - "{{ decapod_flow_source }}"
     - /tmp/.helmrelease-rbac.yaml
+
+- name: run prepare-argocd workflow
+  shell: >-
+    {{ bin_dir }}/argo submit --watch --from wftmpl/prepare-argocd -p argo_password={{ argocd_admin_password  }}
+  become: false
